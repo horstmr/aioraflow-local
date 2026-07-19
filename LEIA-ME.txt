@@ -1,0 +1,36 @@
+AioraFlow — versão portátil (Windows)
+=====================================
+
+Da conversa ao prontuário: grava o áudio da consulta, transcreve localmente
+e gera o prontuário estruturado com a IA (Claude).
+
+COMO USAR
+---------
+1. Extraia esta pasta inteira para qualquer lugar (ex.: Área de Trabalho).
+2. Abra a pasta e execute  AioraFlow.exe  (dê dois cliques).
+   - Na primeira vez, o Windows pode exibir um aviso do SmartScreen
+     ("Windows protegeu o computador"): clique em "Mais informações" >
+     "Executar assim mesmo". Isso ocorre por o app não ser assinado.
+3. No app, clique em "Configurações" (canto superior direito) e cole a sua
+   CHAVE DA API DA ANTHROPIC. Ela fica salva apenas nesta máquina (config.json).
+
+PRIMEIRA TRANSCRIÇÃO
+--------------------
+Na primeira vez que você transcrever um áudio, o modelo de transcrição
+(Whisper) é baixado automaticamente (precisa de internet só nessa vez).
+Depois disso, a transcrição funciona offline.
+
+PRIVACIDADE
+-----------
+- O áudio e a transcrição são processados 100% na sua máquina.
+- Apenas a transcrição em TEXTO é enviada à API da Anthropic para gerar o
+  prontuário. Consultas e pacientes ficam num banco local (data/aioraflow.db,
+  criado ao lado do executável).
+
+REQUISITOS
+----------
+- Windows 10 ou 11 (64 bits).
+- Microsoft Edge WebView2 Runtime (já vem no Windows 10/11 atualizado).
+- Microfone, para a gravação.
+
+Dúvidas ou ajustes: veja o README.md do projeto.

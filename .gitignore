@@ -1,0 +1,18 @@
+# Configuração local com a chave da API — não versionar
+config.json
+
+# Banco de dados local
+data/
+
+# Python
+__pycache__/
+*.pyc
+
+# Snapshot original baixado (referência)
+_raw/
+
+# Artefatos de build e pacotes (o zip vai como release asset, não no Git)
+build/
+dist/
+*.spec
+*.zip
