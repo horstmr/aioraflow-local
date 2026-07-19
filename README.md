@@ -10,16 +10,36 @@ Flask + SQLite. **Sem tela de login** — abre direto no aplicativo.
 > identidade visual (tema escuro, verde `#39E58C`, fonte Geist). Não é uma cópia
 > do backend do produto original (ao qual não há acesso).
 
-## Como rodar
+## Baixar (pronto para usar)
+
+Veja a [página de releases](https://github.com/horstmr/aioraflow-local/releases/latest):
+
+- **Windows:** `AioraFlow-portatil.zip` — extraia e rode `AioraFlow.exe`.
+- **macOS:** `AioraFlow-macOS.zip` — extraia e abra `AioraFlow.app`.
+
+Na **primeira execução**, o app pede sua **chave da API da Anthropic** (usada só
+para gerar o prontuário; gravar e transcrever funciona sem ela).
+
+### Avisos de segurança do sistema (app não assinado)
+
+O app não é assinado digitalmente, então o sistema exibe um aviso na 1ª vez:
+
+- **Windows (SmartScreen):** "Mais informações" › "Executar assim mesmo".
+- **macOS (Gatekeeper):** clique com o **botão direito** no `AioraFlow.app` ›
+  **Abrir** › **Abrir**. Se ainda assim não abrir (Apple Silicon costuma ser mais
+  restrito), rode uma vez no Terminal:
+  `xattr -cr /caminho/para/AioraFlow.app` e abra novamente.
+
+## Rodar pelo código-fonte
 
 ```bash
 pip install -r requirements.txt
 python main.py
 ```
 
-Na primeira execução, abra **Configurações** (canto superior direito) e informe
-sua **chave da API da Anthropic** (ou defina a variável de ambiente
-`ANTHROPIC_API_KEY`). A chave é usada apenas para gerar o prontuário.
+Na primeira execução, o app pede a **chave da API da Anthropic** (ou defina a
+variável de ambiente `ANTHROPIC_API_KEY`). A chave é usada apenas para gerar o
+prontuário.
 
 ## Fluxo de uso
 
