@@ -465,6 +465,62 @@ async function viewConfig() {
   });
 }
 
+/* ---------------- boas-vindas (1ª execução) ---------------- */
+function viewOnboarding() {
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `
+    <div class="modal">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        <span class="brand__mark" style="height:34px;width:34px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="height:18px;width:18px"><path d="M6 20.5V16" stroke-width="1.6"></path><path d="M9 20.5V11" stroke-width="1.6"></path><path d="M12 20.5V4.5" stroke-width="1.6"></path><path d="M15 20.5V11" stroke-width="1.6"></path><path d="M18 20.5V16" stroke-width="1.6"></path><path d="M8.5 14.5H15.5" stroke-width="1.4"></path></svg>
+        </span>
+        <h2 style="margin:0">Bem-vindo ao Aiora<span class="brand__accent">Flow</span></h2>
+      </div>
+      <div class="subtle" style="margin-bottom:18px">Para gerar prontuários, informe sua chave da API da Anthropic. Ela fica salva apenas nesta máquina e é usada só nessa etapa — gravar e transcrever funciona sem ela.</div>
+
+      <label class="field">
+        <span class="field__label">Chave da API da Anthropic</span>
+        <input type="password" id="ob-key" placeholder="sk-ant-..." autofocus />
+      </label>
+      <div class="hint">Você encontra ou cria a chave em console.anthropic.com › API Keys. Pode alterá-la depois em Configurações.</div>
+
+      <div class="actions">
+        <button class="btn btn--ghost btn--sm" id="ob-depois">Configurar depois</button>
+        <div class="spacer"></div>
+        <button class="btn btn--primary btn--sm" id="ob-salvar">Salvar e começar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const entrar = () => { overlay.remove(); viewLista(); };
+  overlay.querySelector("#ob-depois").addEventListener("click", entrar);
+  overlay.querySelector("#ob-salvar").addEventListener("click", async () => {
+    const key = overlay.querySelector("#ob-key").value.trim();
+    if (!key) return toast("Cole a chave ou clique em “Configurar depois”.", true);
+    try {
+      await api("/api/config", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ anthropic_api_key: key }) });
+      toast("Chave salva. Tudo pronto!");
+      entrar();
+    } catch (e) {
+      toast(e.message, true);
+    }
+  });
+  overlay.querySelector("#ob-key").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") overlay.querySelector("#ob-salvar").click();
+  });
+}
+
 /* ---------------- init ---------------- */
 document.getElementById("btn-config").addEventListener("click", viewConfig);
-viewLista();
+
+(async function init() {
+  let cfg = {};
+  try { cfg = await api("/api/config"); } catch (e) { /* mostra a lista mesmo assim */ }
+  if (cfg && cfg.api_key_configurada) {
+    viewLista();
+  } else {
+    viewLista();       // renderiza o fundo
+    viewOnboarding();  // e pede a chave por cima
+  }
+})();

@@ -14,5 +14,5 @@ _raw/
 # Artefatos de build e pacotes (o zip vai como release asset, não no Git)
 build/
 dist/
-*.spec
 *.zip
+# Obs.: AioraFlow.spec É versionado (usado pelo build de CI); não ignorar.

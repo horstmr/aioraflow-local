@@ -1,0 +1,46 @@
+name: Build macOS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # necessário para anexar o artefato ao release
+
+jobs:
+  build-macos:
+    runs-on: macos-latest   # Apple Silicon (arm64)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyobjc-framework-Cocoa pyobjc-framework-WebKit pyobjc-framework-Quartz
+          pip install pyinstaller
+
+      - name: Build do app (.app)
+        run: pyinstaller --noconfirm AioraFlow.spec
+
+      - name: Empacotar .app em zip
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent "AioraFlow.app" "AioraFlow-macOS.zip"
+
+      - name: Publicar como artifact do workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: AioraFlow-macOS
+          path: dist/AioraFlow-macOS.zip
+
+      - name: Anexar ao release v1.0.0
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload v1.0.0 dist/AioraFlow-macOS.zip --clobber
