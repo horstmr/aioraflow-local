@@ -10,7 +10,15 @@ permissions:
 
 jobs:
   build-macos:
-    runs-on: macos-latest   # Apple Silicon (arm64)
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-latest   # Apple Silicon (arm64)
+            arch: arm64
+          - runner: macos-13       # Intel (x86_64)
+            arch: intel
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
 
@@ -28,19 +36,37 @@ jobs:
       - name: Build do app (.app)
         run: pyinstaller --noconfirm AioraFlow.spec
 
+      - name: Assinatura ad-hoc (exigida no Apple Silicon)
+        run: |
+          codesign --force --deep --sign - dist/AioraFlow.app
+          codesign --verify --deep --strict --verbose=2 dist/AioraFlow.app
+
+      # Roda o app empacotado no próprio macOS e confirma que ele inicia:
+      # pega dependência faltando / erro de import antes de publicar.
+      - name: Auto-teste do app empacotado
+        run: |
+          export AIORA_SELFTEST="$PWD/selftest.txt"
+          ./dist/AioraFlow.app/Contents/MacOS/AioraFlow || true
+          if [ ! -f "$AIORA_SELFTEST" ]; then
+            echo "::error::O app não gerou resultado do auto-teste (provável crash na inicialização)."
+            exit 1
+          fi
+          cat "$AIORA_SELFTEST"
+          grep -q "SELFTEST OK" "$AIORA_SELFTEST"
+
       - name: Empacotar .app em zip
         run: |
           cd dist
-          ditto -c -k --sequesterRsrc --keepParent "AioraFlow.app" "AioraFlow-macOS.zip"
+          ditto -c -k --sequesterRsrc --keepParent "AioraFlow.app" "AioraFlow-macOS-${{ matrix.arch }}.zip"
 
       - name: Publicar como artifact do workflow
         uses: actions/upload-artifact@v4
         with:
-          name: AioraFlow-macOS
-          path: dist/AioraFlow-macOS.zip
+          name: AioraFlow-macOS-${{ matrix.arch }}
+          path: dist/AioraFlow-macOS-${{ matrix.arch }}.zip
 
       - name: Anexar ao release v1.0.0
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload v1.0.0 dist/AioraFlow-macOS.zip --clobber
+        run: gh release upload v1.0.0 dist/AioraFlow-macOS-${{ matrix.arch }}.zip --clobber

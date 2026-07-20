@@ -30,11 +30,31 @@ O app não é assinado digitalmente, então o sistema exibe um aviso na 1ª vez:
   restrito), rode uma vez no Terminal:
   `xattr -cr /caminho/para/AioraFlow.app` e abra novamente.
 
+## Modo navegador (mais portátil — recomendado se o app nativo der problema)
+
+O AioraFlow é, por dentro, uma aplicação web. Neste modo ele roda no **seu
+navegador** em vez de numa janela nativa:
+
+- **macOS/Linux:** dê dois cliques em **`run-mac.command`**
+  (se o macOS recusar, rode antes: `chmod +x run-mac.command`).
+- **Windows:** dê dois cliques em **`run-web.bat`**.
+
+Na primeira execução ele prepara o ambiente sozinho (cria um `.venv` e instala
+as dependências); depois é só abrir. O navegador abre automaticamente.
+
+**Por que este modo é mais confiável:** o app nativo usa o motor de navegador
+*do sistema* (WebView2/Chromium no Windows, WKWebView/Safari no macOS), então a
+mesma tela pode renderizar diferente em cada sistema. No modo navegador, quem
+renderiza é o Chrome nos dois lados — o que se testa é exatamente o que se vê.
+Também não depende de empacotamento nativo, arquitetura (Intel/ARM) nem
+Gatekeeper. Use o **Chrome** para paridade total.
+
 ## Rodar pelo código-fonte
 
 ```bash
-pip install -r requirements.txt
-python main.py
+pip install -r requirements.txt   # ou requirements-web.txt (sem pywebview)
+python main.py                    # janela nativa
+python run_web.py                 # no navegador
 ```
 
 Na primeira execução, o app pede a **chave da API da Anthropic** (ou defina a

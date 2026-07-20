@@ -1,0 +1,4 @@
+# Scripts de shell precisam de quebra de linha LF, senão o macOS/Linux
+# recusa executá-los ("bad interpreter").
+*.command text eol=lf
+*.sh      text eol=lf
